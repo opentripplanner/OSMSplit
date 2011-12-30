@@ -85,7 +85,7 @@ select g.way_id, node_from, node_to, st_makeline(geom order by g.sequence_id), '
        g.sequence_id >= f_seq and 
        g.sequence_id <= t_seq group by g.way_id, node_from, node_to;
 
-drop table way_nodes_with_intersections;
+drop table way_nodes_with_intersection;
 
 -- create a table to hold joined streets
 create table streets_conflated (
