@@ -103,6 +103,8 @@ update street_segments set name = (select v from way_tags
        where way_tags.way_id = street_segments.way_id and k = 'alt_name' or k = 'name_1' limit 1), highway = (select v from way_tags 
        where way_tags.way_id = street_segments.way_id and k = 'highway');
 
+update street_segments set name = 'Unnamed street' where name is null;
+
 -- load turn restrictions
 create table turn_restrictions (
        osm_restriction_id bigint not null references relations,
