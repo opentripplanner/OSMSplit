@@ -1,4 +1,4 @@
--- Copyright 2011, OpenPlans 
+-- Copyright 2011, OpenPlans
 --
 -- Licensed under the GNU Lesser General Public License 3.0 or any
 -- later version. See lgpl-3.0.txt for details.
@@ -16,9 +16,13 @@ create table street_segments (
 
        name text,
        alt_name text,
+       name_1 text,
+       oneway text,
+       access text,
+       maxspeed text,
+       junction text,
        highway text
-
-       );
+);
 
 -- Intersections are nodes shared by two or more wys
 
@@ -98,10 +102,32 @@ create table streets_conflated (
 
 -- fill in the name/highway/alt_name
 
-update street_segments set name = (select v from way_tags 
-       where way_tags.way_id = street_segments.way_id and k = 'name'), alt_name = (select v from way_tags 
-       where way_tags.way_id = street_segments.way_id and (k = 'alt_name' or k = 'name_1') limit 1), highway = (select v from way_tags 
-       where way_tags.way_id = street_segments.way_id and k = 'highway');
+update street_segments set
+       access = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'access'),
+
+       alt_name = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'alt_name'),
+
+       highway = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'highway'),
+
+       junction = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'junction'),
+
+       maxspeed = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'maxspeed'),
+
+       name = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'name'),
+
+       name_1 = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'name_1'),
+
+       oneway = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'oneway');
+
+
 
 update street_segments set name = 'Unnamed street' where name is null;
 
