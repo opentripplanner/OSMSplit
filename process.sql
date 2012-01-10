@@ -160,6 +160,44 @@ select tags.relation_id, seg1.id, seg2.id, via.member_id, tags.v from
        (seg1.node_from = via.member_id or seg1.node_to = via.member_id) and 
        (seg2.node_from = via.member_id or seg2.node_to = via.member_id);
 
+create table turns_prohibited (
+       osm_restriction_id bigint not null references relations,
+       segment_from integer not null references street_segments,
+       segment_to integer not null references street_segments,
+       node integer not null references nodes);
+
+
+insert into turns_prohibited 
+select tags.relation_id, seg1.id, seg2.id, via.member_id from
+       relation_tags as tags, 
+       relation_members as via, 
+       relation_members as from_relation, 
+       relation_members as to_relation, 
+       street_segments as seg1,
+       street_segments as seg2
+       where
+       tags.k = 'restriction' and 
+       tags.relation_id = via.relation_id and
+       via.relation_id = from_relation.relation_id and
+       from_relation.relation_id = to_relation.relation_id and
+       via.member_role='via' and via.member_type='N' and
+       from_relation.member_role = 'from' and from_relation.member_type='W' and
+       to_relation.member_role = 'to' and to_relation.member_type='W' and
+
+       (
+          ((tags.v = 'no_u_turn' or tags.v = 'no_straight_on' or tags.v = 'no_left_turn' or tags.v = 'no_right_turn') and 
+          seg1.way_id = from_relation.member_id and
+          seg2.way_id = to_relation.member_id)
+       or 
+          ((tags.v = 'only_straight_on' or tags.v = 'only_left_turn' or tags.v = 'only_right_turn') and 
+          seg1.way_id = from_relation.member_id and
+          seg2.way_id <> to_relation.member_id)
+       )
+
+ and
+       (seg1.node_from = via.member_id or seg1.node_to = via.member_id) and 
+       (seg2.node_from = via.member_id or seg2.node_to = via.member_id);
+
 
 --alter table street_segments drop column name;
 --alter table street_segments drop column highway;
