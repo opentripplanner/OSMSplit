@@ -14,7 +14,7 @@ psql -d osm -f osmosis/script/pgsimple_schema_0.6.sql
 
 
 To load the data:
-osmosis --read-xml file=oregon.osm  --wkv keyValueList=highway.motorway,highway.motorway_link,highway.trunk,highway.trunk_link,highway.primary,highway.primary_link,highway.secondary,highway.secondary_link,highway.tertiary,highway.tertiary_link,highway.residential,highway.residential_link,highway.service,highway.track  --tt tagtransform.xml --write-pgsimp-0.6 user=osm database=osm password=osm
+osmosis --read-xml file=oregon.osm  --wkv keyValueList=highway.motorway,highway.motorway_link,highway.trunk,highway.trunk_link,highway.primary,highway.primary_link,highway.secondary,highway.secondary_link,highway.tertiary,highway.tertiary_link,highway.residential,highway.residential_link,highway.service,highway.track,highway.living_street  --tt tagtransform.xml --write-pgsimp-0.6 user=osm database=osm password=osm
 
 If you wish, you may add options to osmosis to crop the data to a smaller
 region.
