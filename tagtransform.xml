@@ -5,7 +5,7 @@
    <name>Eliminate unused tags</name>
    <description>Remove every tag that's not in a list</description>
    <match>
-     <tag k="highway|maxspeed|access|psv|bus|name|alt_name|name_1|oneway|layer|bridge|tunnel|junction|surface|RLIS:localid" v=".*" type="way" />
+     <tag k="highway|maxspeed|access|psv|bus|name|alt_name|name_1|oneway|layer|bridge|tunnel|junction|surface|RLIS:localid|ref" v=".*" type="way" />
    </match>
    <output>
      <copy-matched/>
