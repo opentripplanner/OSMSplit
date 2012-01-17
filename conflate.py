@@ -107,7 +107,7 @@ def conflate(conn):
         geom = MultiLineString(group_geoms)
 
         length = sum(geom_length(geom) for geom in group_geoms)
-        to_insert.append((name, alt_name, highway, dumps_wkt(geom), length))
+        to_insert.append((name, alt_name, highway, "SRID=4326;" + dumps_wkt(geom), length))
 
     q = "insert into streets_conflated(name, alt_name, highway, geom, length) values (%s,%s,%s,%s,%s)"
     cursor.executemany(q, to_insert)
