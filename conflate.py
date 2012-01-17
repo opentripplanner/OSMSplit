@@ -61,7 +61,7 @@ def load_street_segments(conn):
     for id, way_id, node_from, node_to, name, highway, alt_name, geom in cursor.fetchall():
         geom = loads_wkb(str(geom))
         segs[id] = (way_id, node_from, node_to, name, highway, alt_name)
-        seg = dict(id=id,way_id=way_id,node_from=node_from,node_to=node_to,name=name,highway=highway,alt_name=alt_name, geom=geom)
+        seg = dict(id=id,way_id=way_id,node_from=node_from,node_to=node_to,name=name or '',highway=highway,alt_name=alt_name, geom=geom)
         for node in (node_from, node_to):
             if not node in connected_segs:
                 connected_segs[node] = []
