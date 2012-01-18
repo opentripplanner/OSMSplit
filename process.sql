@@ -21,7 +21,8 @@ create table street_segments (
        access text,
        maxspeed text,
        junction text,
-       highway text
+       highway text,
+       ref text
 );
 
 -- Intersections are nodes shared by two or more wys
@@ -125,7 +126,10 @@ update street_segments set
            where way_tags.way_id = street_segments.way_id and k = 'name_1'),
 
        oneway = (select v from way_tags
-           where way_tags.way_id = street_segments.way_id and k = 'oneway');
+           where way_tags.way_id = street_segments.way_id and k = 'oneway'),
+
+       ref = (select v from way_tags
+           where way_tags.way_id = street_segments.way_id and k = 'ref');
 
 
 
