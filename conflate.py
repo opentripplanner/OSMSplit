@@ -69,6 +69,18 @@ def load_street_segments(conn):
 
     return segs, connected_segs
 
+def crosses_any(segs, new_seg):
+    geom = new_seg['geom']
+    for seg in segs:
+        seg_geom = seg['geom']
+        if (seg_geom.intersects(geom) and
+            seg['node_from'] != new_seg['node_from'] and
+            seg['node_to'] != new_seg['node_from'] and
+            seg['node_from'] != new_seg['node_to'] and
+            seg['node_to'] != new_seg['node_to']):
+            return True
+    return False
+
 def conflate(conn): 
     cursor = conn.cursor()
     segs, connected_segs = load_street_segments(conn)
@@ -88,6 +100,7 @@ def conflate(conn):
         group_segs = []
 
         i = 0
+        visited_from_this_node = []
         while q:
             i += 1
             node = q.pop()
@@ -95,10 +108,12 @@ def conflate(conn):
                 if seg['id'] in visited:
                     continue
                 if seg['name'] == name and seg['highway'] == highway and seg['alt_name'] == seg['alt_name']:
-                    visited.add(seg['id'])
-                    q.append(seg['node_from'])
-                    q.append(seg['node_to'])
-                    group_segs.append(seg)
+                    if not crosses_any(visited_from_this_node, seg):
+                        visited.add(seg['id'])
+                        visited_from_this_node.append(seg)
+                        group_segs.append(seg)
+                        q.append(seg['node_from'])
+                        q.append(seg['node_to'])
 
         if not group_segs:
             continue
