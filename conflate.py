@@ -74,11 +74,7 @@ def crosses_any(segs, new_seg):
     geom = new_seg['geom']
     for seg in segs:
         seg_geom = seg['geom']
-        if (seg_geom.intersects(geom) and
-            seg['node_from'] != new_seg['node_from'] and
-            seg['node_to'] != new_seg['node_from'] and
-            seg['node_from'] != new_seg['node_to'] and
-            seg['node_to'] != new_seg['node_to']):
+        if seg_geom.crosses(geom):
             return True
     return False
 
