@@ -60,8 +60,9 @@ def load_street_segments(conn):
 
     for id, way_id, node_from, node_to, name, highway, alt_name, geom in cursor.fetchall():
         geom = loads_wkb(str(geom))
+        name = name or ''
         segs[id] = (way_id, node_from, node_to, name, highway, alt_name)
-        seg = dict(id=id,way_id=way_id,node_from=node_from,node_to=node_to,name=name or '',highway=highway,alt_name=alt_name, geom=geom)
+        seg = dict(id=id,way_id=way_id,node_from=node_from,node_to=node_to,name=name,highway=highway,alt_name=alt_name, geom=geom)
         for node in (node_from, node_to):
             if not node in connected_segs:
                 connected_segs[node] = []
@@ -107,7 +108,7 @@ def conflate(conn):
             for seg in connected_segs[node]:
                 if seg['id'] in visited:
                     continue
-                if seg['name'] == name and seg['highway'] == highway and seg['alt_name'] == seg['alt_name']:
+                if seg['name'] == name and seg['highway'] == highway and seg['alt_name'] == alt_name:
                     if not crosses_any(visited_from_this_node, seg):
                         visited.add(seg['id'])
                         visited_from_this_node.append(seg)
