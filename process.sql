@@ -141,12 +141,13 @@ create table turn_restrictions (
        segment_from integer not null references street_segments,
        segment_to integer not null references street_segments,
        node integer not null references nodes,
-       type text);
+       type text,
+       exceptions text);
 
 insert into turn_restrictions 
-select tags.relation_id, seg1.id, seg2.id, via.member_id, tags.v from
+select tags.relation_id, seg1.id, seg2.id, via.member_id, tags.v, tags2.v from
        relation_tags as tags, 
-       relation_members as via, 
+       relation_members as via left outer join relation_tags as tags2 on tags2.relation_id = via.relation_id and tags2.k = 'except',
        relation_members as from_relation, 
        relation_members as to_relation, 
        street_segments as seg1,
