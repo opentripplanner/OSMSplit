@@ -153,6 +153,7 @@ select tags.relation_id, seg1.id, seg2.id, via.member_id, tags.v, tags2.v from
        street_segments as seg1,
        street_segments as seg2
        where
+       ((tags2.v is null) or (not tags2.v like '%psv%')) and
        tags.k = 'restriction' and 
        tags.relation_id = via.relation_id and
        via.relation_id = from_relation.relation_id and
@@ -169,18 +170,20 @@ create table turns_prohibited (
        osm_restriction_id bigint not null references relations,
        segment_from integer not null references street_segments,
        segment_to integer not null references street_segments,
-       node integer not null references nodes);
+       node integer not null references nodes,
+       exceptions text);
 
 
 insert into turns_prohibited 
-select tags.relation_id, seg1.id, seg2.id, via.member_id from
+select tags.relation_id, seg1.id, seg2.id, via.member_id, tags2.v from
        relation_tags as tags, 
-       relation_members as via, 
+       relation_members as via left outer join relation_tags as tags2 on tags2.relation_id = via.relation_id and tags2.k = 'except',
        relation_members as from_relation, 
        relation_members as to_relation, 
        street_segments as seg1,
        street_segments as seg2
        where
+       ((tags2.v is null) or (not tags2.v like '%psv%')) and
        tags.k = 'restriction' and 
        tags.relation_id = via.relation_id and
        via.relation_id = from_relation.relation_id and
