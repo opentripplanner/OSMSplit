@@ -153,7 +153,7 @@ select tags.relation_id, seg1.id, seg2.id, via.member_id, tags.v, tags2.v from
        street_segments as seg1,
        street_segments as seg2
        where
-       ((tags2.v is null) or (not tags2.v like '%psv%')) and
+       ((tags2.v is null) or (not (tags2.v like '%psv%' or tags2.v like '%bus%'))) and
        tags.k = 'restriction' and 
        tags.relation_id = via.relation_id and
        via.relation_id = from_relation.relation_id and
@@ -183,7 +183,7 @@ select tags.relation_id, seg1.id, seg2.id, via.member_id, tags2.v from
        street_segments as seg1,
        street_segments as seg2
        where
-       ((tags2.v is null) or (not tags2.v like '%psv%')) and
+       ((tags2.v is null) or (not (tags2.v like '%psv%' or tags2.v like '%bus%'))) and
        tags.k = 'restriction' and 
        tags.relation_id = via.relation_id and
        via.relation_id = from_relation.relation_id and
