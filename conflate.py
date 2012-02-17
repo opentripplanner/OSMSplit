@@ -2,24 +2,25 @@
 #
 # Licensed under the GNU Lesser General Public License 3.0 or any
 # later version. See lgpl-3.0.txt for details.
-
+import psycopg2
+import os
+import math
+from time     import time
 from datetime import datetime
 
 from shapely.geometry import MultiLineString
-
 from shapely.wkb import loads as loads_wkb, dumps as dumps_wkb
 from shapely.wkt import loads as loads_wkt, dumps as dumps_wkt
-
-#why on earth is this not done automatically?
-from shapely import speedups
+from shapely     import speedups
 if speedups.available:
     speedups.enable()
 
-import psycopg2
-
-conn = psycopg2.connect(database="osm", user="osm", password="osm")
-
-import math
+# DB connection with env_var override / default values
+dbname=os.environ.get(  'PGDBNAME', 'osm')
+dbuser=os.environ.get(  'PGUSER',   'osm')
+dbpass=os.environ.get(  'PGUSER',   'osm')
+dbschema=os.environ.get('PGSCHEMA', 'public')
+conn = psycopg2.connect(database=dbname, user=dbuser, password=dbpass)
 
 def distance(long1, lat1, long2, lat2):
     """Returns the distance, in meters, between two points on the earth's
@@ -51,7 +52,7 @@ def geom_length(linestring):
 
 def load_street_segments(conn):
     cursor = conn.cursor()
-    q = "SELECT id, way_id, node_from, node_to, name, highway, alt_name, ST_AsBinary(geom) from street_segments"
+    q = "SELECT id, way_id, node_from, node_to, name, highway, alt_name, ST_AsBinary(geom) from " + dbschema + ".street_segments"
 
     segs = {}
     connected_segs = {}
@@ -84,7 +85,6 @@ def conflate(conn):
     visited = set()
 
     to_insert = []
-    from time import time
 
     start = time()
     for id, (way_id, node_from, node_to, name, highway, alt_name) in segs.iteritems():
@@ -121,7 +121,7 @@ def conflate(conn):
         length = sum(geom_length(geom) for geom in group_geoms)
         to_insert.append((name, alt_name, highway, "SRID=4326;" + dumps_wkt(geom), length))
 
-    q = "insert into streets_conflated(name, alt_name, highway, geom, length) values (%s,%s,%s,%s,%s)"
+    q = "insert into " + dbschema + ".streets_conflated(name, alt_name, highway, geom, length) values (%s,%s,%s,%s,%s)"
     cursor.executemany(q, to_insert)
     conn.commit()
 
